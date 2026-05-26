@@ -1,0 +1,30 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Type checker
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Package build artifacts
+*.egg-info/
+dist/
+build/
+*.whl
+*.tar.gz
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Generated maze output files (not the config)
+maze.txt
+output_maze.txt
