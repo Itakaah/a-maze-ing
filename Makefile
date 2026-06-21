@@ -13,7 +13,10 @@ MYPY_FLAGS = --warn-return-any --warn-unused-ignores \
 .PHONY: install run debug clean lint lint-strict test build
 
 install:
-	$(PYTHON) -m venv $(VENV)
+	@if ! $(PYTHON) -m venv $(VENV) 2>/dev/null; then \
+		sudo apt-get install -y python3-venv python3.10-venv python3-pip 2>/dev/null || true; \
+		$(PYTHON) -m venv $(VENV); \
+	fi
 	$(PIP) install --quiet flake8 mypy pytest build
 
 run: install

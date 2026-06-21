@@ -32,7 +32,7 @@ def get_open_neighbours(
     Returns:
         List of (neighbour_col, neighbour_row, direction_letter) tuples.
     """
-    neighbours: list[tuple[int, int, str]] = []
+    neighbours = []
     for delta_col, delta_row, wall, direction in SOLVER_MOVES:
         new_col = col + delta_col
         new_row = row + delta_row
@@ -42,31 +42,6 @@ def get_open_neighbours(
             continue
         neighbours.append((new_col, new_row, direction))
     return neighbours
-
-
-def reconstruct_path(
-    parent: dict[tuple[int, int], tuple[tuple[int, int], str]],
-    entry: tuple[int, int],
-    exit_pos: tuple[int, int],
-) -> list[str]:
-    """Rebuild the direction sequence from BFS parent pointers.
-
-    Args:
-        parent: Maps each visited cell to (previous_cell, direction_taken).
-        entry: Starting cell (col, row).
-        exit_pos: Destination cell (col, row).
-
-    Returns:
-        List of direction letters ('N', 'E', 'S', 'W') from entry to exit.
-    """
-    directions: list[str] = []
-    current = exit_pos
-    while current != entry:
-        prev_cell, direction = parent[current]
-        directions.append(direction)
-        current = prev_cell
-    directions.reverse()
-    return directions
 
 
 def solve_maze(
@@ -87,7 +62,7 @@ def solve_maze(
     """
     if entry == exit_pos:
         return []
-    visited: set[tuple[int, int]] = {entry}
+    visited = {entry}
     queue: deque[tuple[int, int]] = deque([entry])
     parent: dict[tuple[int, int], tuple[tuple[int, int], str]] = {}
     while queue:
@@ -100,7 +75,14 @@ def solve_maze(
             visited.add((new_col, new_row))
             parent[(new_col, new_row)] = ((col, row), direction)
             if (new_col, new_row) == exit_pos:
-                return reconstruct_path(parent, entry, exit_pos)
+                directions = []
+                current = exit_pos
+                while current != entry:
+                    prev_cell, step = parent[current]
+                    directions.append(step)
+                    current = prev_cell
+                directions.reverse()
+                return directions
             queue.append((new_col, new_row))
     return None
 
