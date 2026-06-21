@@ -1,5 +1,5 @@
 PYTHON = python3
-VENV   = .venv
+VENV   = venv
 PIP    = $(VENV)/bin/pip
 FLAKE8 = $(VENV)/bin/flake8
 MYPY   = $(VENV)/bin/mypy
@@ -17,8 +17,7 @@ MYPY_FLAGS = --warn-return-any --warn-unused-ignores \
 
 install:
 	@if ! $(PYTHON) -m venv $(VENV) 2>/dev/null; then \
-		$(PYTHON) -m pip install --user --quiet virtualenv 2>/dev/null || \
-		$(PYTHON) -m pip install --user --quiet --break-system-packages virtualenv; \
+		pip3 install --quiet virtualenv; \
 		$(PYTHON) -m virtualenv $(VENV); \
 	fi
 	$(PIP) install --quiet flake8 mypy pytest build
