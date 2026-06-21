@@ -2,7 +2,6 @@ import sys
 
 from src.maze_model import MazeGrid
 
-# Each digit is 5 rows x 3 cols. 1 = reserved cell, 0 = passage cell.
 DIGIT_4 = [
     [1, 0, 1],
     [1, 0, 1],
@@ -19,10 +18,10 @@ DIGIT_2 = [
     [1, 1, 1],
 ]
 
-PATTERN_HEIGHT: int = 5       # rows used by each digit
-PATTERN_DIGIT_WIDTH: int = 3  # cols used by each digit
-PATTERN_GAP: int = 1          # gap column between '4' and '2'
-PATTERN_MARGIN: int = 1       # minimum margin around the pattern
+PATTERN_HEIGHT: int = 5
+PATTERN_DIGIT_WIDTH: int = 3
+PATTERN_GAP: int = 1
+PATTERN_MARGIN: int = 1
 
 PATTERN_TOTAL_WIDTH: int = (
     PATTERN_DIGIT_WIDTH + PATTERN_GAP + PATTERN_DIGIT_WIDTH

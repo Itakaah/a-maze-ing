@@ -1,8 +1,8 @@
-WALL_NORTH: int = 1    # bit 0 — North wall
-WALL_EAST: int = 2     # bit 1 — East wall
-WALL_SOUTH: int = 4    # bit 2 — South wall
-WALL_WEST: int = 8     # bit 3 — West wall
-ALL_WALLS: int = 15    # 0xF — all four walls closed
+WALL_NORTH: int = 1
+WALL_EAST: int = 2
+WALL_SOUTH: int = 4
+WALL_WEST: int = 8
+ALL_WALLS: int = 15
 
 OPPOSITE_WALL: dict[int, int] = {
     WALL_NORTH: WALL_SOUTH,

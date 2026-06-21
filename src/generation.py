@@ -11,7 +11,6 @@ from src.maze_model import (
 )
 from src.pattern_42 import apply_pattern_42
 
-# Each entry: (delta_col, delta_row, wall_on_current, wall_on_neighbour)
 DIRECTION_MOVES = [
     (0, -1, WALL_NORTH, WALL_SOUTH),
     (1, 0, WALL_EAST, WALL_WEST),
@@ -19,7 +18,7 @@ DIRECTION_MOVES = [
     (-1, 0, WALL_WEST, WALL_EAST),
 ]
 
-EXTRA_PASSAGE_CHANCE = 0.12  # chance to open a wall in non-perfect mode
+EXTRA_PASSAGE_CHANCE = 0.12
 
 
 def open_passage(
@@ -159,7 +158,6 @@ def generate_maze(config: MazeConfig) -> MazeGrid:
         exit_pos=config.exit_pos,
     )
     apply_pattern_42(grid)
-    # Entry and exit must never be blocked by the pattern.
     entry_col, entry_row = config.entry
     exit_col, exit_row = config.exit_pos
     grid.get_cell(entry_col, entry_row).reserved = False

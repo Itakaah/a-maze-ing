@@ -5,20 +5,18 @@ from src.maze_model import (
     MazeGrid,
 )
 
-# ANSI colour escape codes
 COLOR_RESET: str = "\033[0m"
-COLOR_MAGENTA: str = "\033[95m"    # entry marker
-COLOR_RED: str = "\033[91m"        # exit marker
-COLOR_RESERVED_BG: str = "\033[46m"  # cyan background for pattern-42 cells
+COLOR_MAGENTA: str = "\033[95m"
+COLOR_RED: str = "\033[91m"
+COLOR_RESERVED_BG: str = "\033[46m"
 
-# Wall colours the user can cycle through (option 3 in the menu)
 WALL_COLORS: list[str] = [
-    "\033[97m",   # bright white
-    "\033[93m",   # bright yellow
-    "\033[92m",   # bright green
-    "\033[94m",   # bright blue
-    "\033[95m",   # bright magenta
-    "\033[91m",   # bright red
+    "\033[97m",
+    "\033[93m",
+    "\033[92m",
+    "\033[94m",
+    "\033[95m",
+    "\033[91m",
 ]
 WALL_COLOR_NAMES: list[str] = [
     "white", "yellow", "green", "blue", "magenta", "red",
@@ -28,7 +26,7 @@ CHAR_CORNER: str = "+"
 CHAR_H_WALL: str = "-"
 CHAR_V_WALL: str = "|"
 CHAR_OPEN: str = " "
-CELL_INNER: int = 3  # chars per cell interior / horizontal wall segment
+CELL_INNER: int = 3
 CHAR_ENTRY: str = "E"
 CHAR_EXIT: str = "X"
 CHAR_RESERVED: str = "#"

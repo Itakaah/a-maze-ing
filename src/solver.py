@@ -8,7 +8,6 @@ from src.maze_model import (
     MazeGrid,
 )
 
-# (delta_col, delta_row, wall_to_cross, direction_letter)
 SOLVER_MOVES = [
     (0, -1, WALL_NORTH, "N"),
     (1, 0, WALL_EAST, "E"),

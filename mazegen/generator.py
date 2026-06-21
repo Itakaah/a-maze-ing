@@ -14,7 +14,6 @@ OPPOSITE: dict[int, int] = {
     WALL_WEST: WALL_EAST,
 }
 
-# (delta_col, delta_row, wall_on_current, wall_on_neighbour)
 DFS_MOVES: list[tuple[int, int, int, int]] = [
     (0, -1, WALL_NORTH, WALL_SOUTH),
     (1, 0, WALL_EAST, WALL_WEST),
@@ -236,7 +235,7 @@ class MazeGenerator:
 
         gen = MazeGenerator(width=20, height=15, seed=42)
         gen.generate()
-        grid = gen.get_grid()   # list[list[int]], wall bitmasks 0-15
+        grid = gen.get_grid()
         path = gen.get_solution()  # list of 'N'/'E'/'S'/'W' or None
     """
 
@@ -290,7 +289,6 @@ class MazeGenerator:
         reserved: set[tuple[int, int]] = (
             set(pattern) if pattern is not None else set()
         )
-        # Entry and exit must never be blocked by the pattern.
         reserved.discard(self._entry)
         reserved.discard(self._exit_pos)
         rng = random.Random(self._seed)
