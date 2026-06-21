@@ -17,8 +17,9 @@ MYPY_FLAGS = --warn-return-any --warn-unused-ignores \
 
 install:
 	@if ! $(PYTHON) -m venv $(VENV) 2>/dev/null; then \
-		sudo apt-get install -y python3-venv python$(PYTHON_VERSION)-venv 2>/dev/null || true; \
-		$(PYTHON) -m venv $(VENV); \
+		$(PYTHON) -m pip install --user --quiet virtualenv 2>/dev/null || \
+		$(PYTHON) -m pip install --user --quiet --break-system-packages virtualenv; \
+		$(PYTHON) -m virtualenv $(VENV); \
 	fi
 	$(PIP) install --quiet flake8 mypy pytest build
 
