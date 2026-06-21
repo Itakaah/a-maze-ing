@@ -13,8 +13,7 @@ MYPY_FLAGS = --warn-return-any --warn-unused-ignores \
 .PHONY: install run debug clean lint lint-strict test build
 
 install:
-	pip3 install --quiet virtualenv
-	$(PYTHON) -m virtualenv $(VENV)
+	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --quiet flake8 mypy pytest build
 
 run:
