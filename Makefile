@@ -17,10 +17,10 @@ install:
 	$(PYTHON) -m virtualenv $(VENV)
 	$(PIP) install --quiet flake8 mypy pytest build
 
-run: install
+run:
 	$(VENV)/bin/python a_maze_ing.py config.txt
 
-debug: install
+debug:
 	$(VENV)/bin/python -m pdb a_maze_ing.py config.txt
 
 clean:
@@ -30,16 +30,16 @@ clean:
 	find . -type d -name "dist" -exec rm -rf {} + 2>/dev/null || true
 	rm -f maze.txt
 
-lint: install
+lint:
 	$(FLAKE8) .
 	$(MYPY) . $(MYPY_FLAGS)
 
-lint-strict: install
+lint-strict:
 	$(MYPY) . --strict
 
-test: install
+test:
 	$(PYTEST) tests/ -v
 
-build: install
+build:
 	$(PIP) install --quiet build
 	$(BUILD) --wheel --outdir .
