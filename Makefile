@@ -6,9 +6,6 @@ MYPY   = $(VENV)/bin/mypy
 PYTEST = $(VENV)/bin/pytest
 BUILD  = $(VENV)/bin/python -m build
 
-PYTHON_VERSION := $(shell python3 -c \
-	"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-
 MYPY_FLAGS = --warn-return-any --warn-unused-ignores \
              --ignore-missing-imports \
              --disallow-untyped-defs --check-untyped-defs
@@ -16,10 +13,8 @@ MYPY_FLAGS = --warn-return-any --warn-unused-ignores \
 .PHONY: install run debug clean lint lint-strict test build
 
 install:
-	@if ! $(PYTHON) -m venv $(VENV) 2>/dev/null; then \
-		pip3 install --quiet virtualenv; \
-		$(PYTHON) -m virtualenv $(VENV); \
-	fi
+	pip3 install --quiet virtualenv
+	$(PYTHON) -m virtualenv $(VENV)
 	$(PIP) install --quiet flake8 mypy pytest build
 
 run: install
