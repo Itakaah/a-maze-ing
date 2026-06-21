@@ -202,3 +202,7 @@ early (e.g. wall coherence after DFS, reserved-cell isolation).
 
 **What to improve:** The renderer output could benefit from a curses-based
 display to avoid screen flicker on each redraw.
+
+**Specific tools used:** Python 3.14, flake8 (linting), mypy (static type
+checking), pytest (unit testing), Claude (Anthropic) for AI assistance,
+Git for version control.
