@@ -1,4 +1,30 @@
-.DS_Store
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Generated files
+maze.txt
+*.whl
+!mazegen-1.0.0-py3-none-any.whl
+*.tar.gz
+
+# Study notes
+COURS.md
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

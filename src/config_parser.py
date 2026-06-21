@@ -1,148 +1,181 @@
 from dataclasses import dataclass
 
+
+REQUIRED_KEYS: set[str] = {
+    "WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"
+}
+MIN_DIMENSION: int = 2
+
+
+class ConfigError(Exception):
+    """Raised when the configuration file contains an error."""
+
+    pass
+
+
 @dataclass
 class MazeConfig:
-    """Validated configuration of the labyrinth.
+    """Holds all validated configuration values for maze generation."""
 
-    Attributes:
-        width: Width of the maze.
-        height: Height of the maze.
-        entry_pos: Coords of the entry point.
-        exit_pos: Coords of the exit.
-        output_file: File containing the encoded maze.
-        perfect: Wether the maze is perfect or not.
-        seed: Random number to always generate the same maze.
-    """
     width: int
     height: int
-    entry_pos: tuple[int, int]
+    entry: tuple[int, int]
     exit_pos: tuple[int, int]
     output_file: str
     perfect: bool
+    seed: int | None
+
+
+def parse_coordinate(value: str, key: str) -> tuple[int, int]:
+    """Parse a 'x,y' string into an integer coordinate tuple.
+
+    Args:
+        value: Raw string from config file (e.g. '0,14').
+        key: Config key name, used in error messages.
+
+    Returns:
+        A tuple (x, y) of non-negative integers.
+
+    Raises:
+        ConfigError: If the format or values are invalid.
+    """
+    parts = value.split(",")
+    if len(parts) != 2:
+        raise ConfigError(
+            f"{key} must be in 'x,y' format, got '{value}'"
+        )
+    try:
+        x_coord = int(parts[0].strip())
+        y_coord = int(parts[1].strip())
+    except ValueError as error:
+        raise ConfigError(
+            f"{key} coordinates must be integers, got '{value}'"
+        ) from error
+    if x_coord < 0 or y_coord < 0:
+        raise ConfigError(
+            f"{key} coordinates must be >= 0, got ({x_coord},{y_coord})"
+        )
+    return (x_coord, y_coord)
+
+
+def parse_line(line: str) -> tuple[str, str] | None:
+    """Parse one config line into a (key, value) pair.
+
+    Blank lines and comment lines (starting with '#') return None.
+
+    Args:
+        line: A single raw line from the config file.
+
+    Returns:
+        A (key, value) pair, or None for blank/comment lines.
+
+    Raises:
+        ConfigError: If the line is not blank, comment, or KEY=VALUE.
+    """
+    stripped = line.strip()
+    if not stripped or stripped.startswith("#"):
+        return None
+    if "=" not in stripped:
+        raise ConfigError(
+            f"Invalid line (missing '='): '{stripped}'"
+        )
+    key, _, value = stripped.partition("=")
+    return (key.strip(), value.strip())
+
+
+def validate_config_values(raw: dict[str, str]) -> MazeConfig:
+    """Validate a dict of raw key/value strings and build a MazeConfig.
+
+    Args:
+        raw: Dictionary of config keys to their raw string values.
+
+    Returns:
+        A fully validated MazeConfig instance.
+
+    Raises:
+        ConfigError: If any required key is missing or any value is invalid.
+    """
+    missing = REQUIRED_KEYS - raw.keys()
+    if missing:
+        raise ConfigError(
+            f"Missing required keys: {', '.join(sorted(missing))}"
+        )
+    try:
+        width = int(raw["WIDTH"])
+        height = int(raw["HEIGHT"])
+    except ValueError as error:
+        raise ConfigError(
+            f"WIDTH and HEIGHT must be integers: {error}"
+        ) from error
+    if width < MIN_DIMENSION or height < MIN_DIMENSION:
+        raise ConfigError(
+            f"WIDTH and HEIGHT must be >= {MIN_DIMENSION},"
+            f" got {width}x{height}"
+        )
+    entry = parse_coordinate(raw["ENTRY"], "ENTRY")
+    exit_pos = parse_coordinate(raw["EXIT"], "EXIT")
+    if not (0 <= entry[0] < width and 0 <= entry[1] < height):
+        raise ConfigError(
+            f"ENTRY {entry} is outside maze bounds ({width}x{height})"
+        )
+    if not (0 <= exit_pos[0] < width and 0 <= exit_pos[1] < height):
+        raise ConfigError(
+            f"EXIT {exit_pos} is outside maze bounds ({width}x{height})"
+        )
+    if entry == exit_pos:
+        raise ConfigError("ENTRY and EXIT must be different positions")
+    perfect_str = raw["PERFECT"].strip().lower()
+    if perfect_str not in ("true", "false"):
+        raise ConfigError(
+            f"PERFECT must be 'True' or 'False', got '{raw['PERFECT']}'"
+        )
+    perfect = perfect_str == "true"
     seed: int | None = None
-
-
-def parse_config_file(path: str) -> dict[str, str]:
-    """Reads a configuration file and returns key-value pairs as a dictionary.
-
-    Args:
-        path: The path to the config file
-
-    Returns:
-        A dict that has the name of the parameter for key and its value.
-
-    Raises:
-        FileNotFoundError: When the file path doesn't exist.
-    """
-    res: dict[str, str] = {}
-
-    try:
-        with open(path, "r") as file:
-            for line in file:
-                line = line.strip()
-                if line.startswith("#"):
-                    continue
-                if line == "":
-                    continue
-                tmp: list[str] = line.split("=", 1)
-                if len(tmp) != 2:
-                    continue
-                res[tmp[0]] = tmp[1]
-    except FileNotFoundError as e:
-        raise FileNotFoundError(e)
-    
-    return res
-
-
-def validate_and_build_config(brut_dict: dict[str, str]) -> MazeConfig:
-    """Creates and returns a MazeConfig from a dict with all args.
-
-    Args:
-        brut_dict: The dict that contains all args in the config file
-
-    Returns:
-        A MazeConfig with all the values from config file.
-
-    Raises:
-        ValueError: When the arg values are wrong.
-    """
-    arg_list: list[str] = [
-        "WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"
-        ]
-    
-    for i in arg_list:
-        if i not in brut_dict:
-            raise ValueError(f"Missing key in the config file : {i}")
-    
-    try:
-        width: int = int(brut_dict["WIDTH"])
-    except ValueError:
-        raise ValueError(
-            f"WIDTH must be an integer, got '{brut_dict['WIDTH']}'"
-        )
-
-    try:
-        height: int = int(brut_dict["HEIGHT"])
-    except ValueError:
-        raise ValueError(
-            f"HEIGHT must be an integer, got '{brut_dict['HEIGHT']}'"
-        )
-
-    try:
-        entry_pos: tuple[int, int] = (
-            int(brut_dict["ENTRY"].split(",")[0]),
-            int(brut_dict["ENTRY"].split(",")[1])
-        )
-    except ValueError:
-        raise ValueError(
-            f"ENTRY must be two integers separated by a comma, "
-            f"got {brut_dict['ENTRY']}"
-        )
-
-    try:
-        exit_pos: tuple[int, int] = (
-            int(brut_dict["EXIT"].split(",")[0]),
-            int(brut_dict["EXIT"].split(",")[1])
-        )
-    except ValueError:
-        raise ValueError(
-            f"EXIT must be two integers separated by a comma, "
-            f"got {brut_dict['EXIT']}"
-        )
-    
-    output_file: str = brut_dict["OUTPUT_FILE"]
-    perfect: bool = brut_dict["PERFECT"] == "True"
-
-    if "SEED" in brut_dict:
+    if "SEED" in raw:
         try:
-            seed: int | None = int(brut_dict["SEED"])
-        except ValueError:
-            raise ValueError(
-                f"SEED must be an integer, got {brut_dict['SEED']}"
-            )
-    else:
-        seed: int | None = None
-
+            seed = int(raw["SEED"])
+        except ValueError as error:
+            raise ConfigError(
+                f"SEED must be an integer: {error}"
+            ) from error
     return MazeConfig(
         width=width,
         height=height,
-        entry_pos=entry_pos,
+        entry=entry,
         exit_pos=exit_pos,
-        output_file=output_file,
+        output_file=raw["OUTPUT_FILE"],
         perfect=perfect,
-        seed=seed
+        seed=seed,
     )
 
 
-def load_config(path: str) -> MazeConfig:
-    """Parses the config file and create and returns a MazeConfig with the right
-        values
+def parse_config(filepath: str) -> MazeConfig:
+    """Read and parse a maze configuration file.
 
     Args:
-        path: The path to the config file
+        filepath: Path to the config file (e.g. 'config.txt').
 
     Returns:
-        The final MazeConfig with all the good values from config file.
+        A validated MazeConfig instance.
+
+    Raises:
+        ConfigError: If the file cannot be opened or contains errors.
     """
-    brut_dict: dict[str, str] = parse_config_file(path)
-    return validate_and_build_config(brut_dict)
+    raw: dict[str, str] = {}
+    try:
+        with open(filepath, "r", encoding="utf-8") as config_file:
+            for line_number, line in enumerate(config_file, start=1):
+                try:
+                    parsed = parse_line(line)
+                except ConfigError as error:
+                    raise ConfigError(
+                        f"Line {line_number}: {error}"
+                    ) from error
+                if parsed is not None:
+                    key, value = parsed
+                    raw[key] = value
+    except OSError as error:
+        raise ConfigError(
+            f"Cannot open config file '{filepath}': {error}"
+        ) from error
+    return validate_config_values(raw)
