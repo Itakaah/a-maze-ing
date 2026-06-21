@@ -7,10 +7,9 @@ from src.maze_model import (
 
 # ANSI colour escape codes
 COLOR_RESET: str = "\033[0m"
-COLOR_MAGENTA: str = "\033[95m"   # entry marker
-COLOR_RED: str = "\033[91m"       # exit marker
-COLOR_PATH_BG: str = "\033[46m"   # cyan background for path cells
-COLOR_RESERVED: str = "\033[90m"  # pattern-42 cells (dark grey)
+COLOR_MAGENTA: str = "\033[95m"    # entry marker
+COLOR_RED: str = "\033[91m"        # exit marker
+COLOR_RESERVED_BG: str = "\033[46m"  # cyan background for pattern-42 cells
 
 # Wall colours the user can cycle through (option 3 in the menu)
 WALL_COLORS: list[str] = [
@@ -98,8 +97,8 @@ def _render_horizontal_border_line(
 def _cell_body_char(col: int, row: int, grid: MazeGrid) -> str:
     """Choose the display character (with colour) for a cell's interior.
 
-    Priority: entry > exit > reserved > empty.
-    Path cells are handled separately in _render_cell_row_line.
+    Priority: entry > exit > empty.
+    Path and reserved cells are handled separately in _render_cell_row_line.
 
     Args:
         col: Column of the cell.
@@ -114,8 +113,6 @@ def _cell_body_char(col: int, row: int, grid: MazeGrid) -> str:
         return _colored(CHAR_ENTRY, COLOR_MAGENTA)
     if pos == grid.exit_pos:
         return _colored(CHAR_EXIT, COLOR_RED)
-    if grid.get_cell(col, row).reserved:
-        return _colored(CHAR_RESERVED, COLOR_RESERVED)
     return CHAR_OPEN
 
 
@@ -148,7 +145,9 @@ def _render_cell_row_line(
         pos = (col, row)
         if (show_path and pos in path_cells
                 and pos != grid.entry and pos != grid.exit_pos):
-            parts.append(_colored(CHAR_OPEN * CELL_INNER, COLOR_PATH_BG))
+            parts.append(CHAR_OPEN + CHAR_RESERVED + CHAR_OPEN)
+        elif grid.get_cell(col, row).reserved:
+            parts.append(_colored(CHAR_OPEN * CELL_INNER, COLOR_RESERVED_BG))
         else:
             body = _cell_body_char(col, row, grid)
             parts.append(CHAR_OPEN + body + CHAR_OPEN)
