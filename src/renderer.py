@@ -9,7 +9,7 @@ from src.maze_model import (
 COLOR_RESET: str = "\033[0m"
 COLOR_MAGENTA: str = "\033[95m"   # entry marker
 COLOR_RED: str = "\033[91m"       # exit marker
-COLOR_CYAN: str = "\033[96m"      # path marker
+COLOR_PATH_BG: str = "\033[46m"   # cyan background for path cells
 COLOR_RESERVED: str = "\033[90m"  # pattern-42 cells (dark grey)
 
 # Wall colours the user can cycle through (option 3 in the menu)
@@ -32,7 +32,6 @@ CHAR_OPEN: str = " "
 CELL_INNER: int = 3  # chars per cell interior / horizontal wall segment
 CHAR_ENTRY: str = "E"
 CHAR_EXIT: str = "X"
-CHAR_PATH: str = "."
 CHAR_RESERVED: str = "#"
 
 
@@ -96,23 +95,16 @@ def _render_horizontal_border_line(
     return "".join(parts)
 
 
-def _cell_body_char(
-    col: int,
-    row: int,
-    grid: MazeGrid,
-    path_cells: set[tuple[int, int]],
-    show_path: bool,
-) -> str:
+def _cell_body_char(col: int, row: int, grid: MazeGrid) -> str:
     """Choose the display character (with colour) for a cell's interior.
 
-    Priority: entry > exit > path > reserved > empty.
+    Priority: entry > exit > reserved > empty.
+    Path cells are handled separately in _render_cell_row_line.
 
     Args:
         col: Column of the cell.
         row: Row of the cell.
         grid: The maze grid.
-        path_cells: Set of (col, row) positions on the solution path.
-        show_path: Whether the solution path is currently visible.
 
     Returns:
         A single coloured character string.
@@ -122,8 +114,6 @@ def _cell_body_char(
         return _colored(CHAR_ENTRY, COLOR_MAGENTA)
     if pos == grid.exit_pos:
         return _colored(CHAR_EXIT, COLOR_RED)
-    if show_path and pos in path_cells:
-        return _colored(CHAR_PATH, COLOR_CYAN)
     if grid.get_cell(col, row).reserved:
         return _colored(CHAR_RESERVED, COLOR_RESERVED)
     return CHAR_OPEN
@@ -155,8 +145,13 @@ def _render_cell_row_line(
             parts.append(_colored(CHAR_V_WALL, wall_color))
         else:
             parts.append(CHAR_OPEN)
-        body = _cell_body_char(col, row, grid, path_cells, show_path)
-        parts.append(CHAR_OPEN + body + CHAR_OPEN)
+        pos = (col, row)
+        if (show_path and pos in path_cells
+                and pos != grid.entry and pos != grid.exit_pos):
+            parts.append(_colored(CHAR_OPEN * CELL_INNER, COLOR_PATH_BG))
+        else:
+            body = _cell_body_char(col, row, grid)
+            parts.append(CHAR_OPEN + body + CHAR_OPEN)
     parts.append(_colored(CHAR_V_WALL, wall_color))
     return "".join(parts)
 
