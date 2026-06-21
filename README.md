@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by Itakaah.*
+*This project has been created as part of the 42 curriculum by ausmanov, aousmano.*
 
 ## Description
 
@@ -29,16 +29,16 @@ python3 a_maze_ing.py config.txt
 
 ### Makefile targets
 
-| Target       | Description                                      |
-|--------------|--------------------------------------------------|
-| `install`    | Create `.venv` and install flake8, mypy, pytest  |
-| `run`        | Launch the maze program with `config.txt`        |
-| `debug`      | Launch with `pdb` debugger                       |
-| `clean`      | Remove `__pycache__`, `.mypy_cache`, build files |
-| `lint`       | Run `flake8` and `mypy` with required flags      |
-| `lint-strict`| Run `mypy --strict`                              |
-| `test`       | Run the pytest test suite                        |
-| `build`      | Build `mazegen-1.0.0-py3-none-any.whl`          |
+| Target        | Description                                      |
+|---------------|--------------------------------------------------|
+| `install`     | Create `.venv` and install flake8, mypy, pytest  |
+| `run`         | Launch the maze program with `config.txt`        |
+| `debug`       | Launch with `pdb` debugger                       |
+| `clean`       | Remove `__pycache__`, `.mypy_cache`, build files |
+| `lint`        | Run `flake8` and `mypy` with required flags      |
+| `lint-strict` | Run `mypy --strict`                              |
+| `test`        | Run the pytest test suite                        |
+| `build`       | Build `mazegen-1.0.0-py3-none-any.whl`           |
 
 ### Interactive menu
 
@@ -54,15 +54,15 @@ Once the maze is displayed, use number keys then Enter:
 The configuration file uses `KEY=VALUE` pairs, one per line.
 Lines starting with `#` are comments and are ignored.
 
-| Key           | Required | Description                                    | Example        |
-|---------------|----------|------------------------------------------------|----------------|
-| `WIDTH`       | Yes      | Number of columns (≥ 2)                        | `WIDTH=20`     |
-| `HEIGHT`      | Yes      | Number of rows (≥ 2)                           | `HEIGHT=15`    |
-| `ENTRY`       | Yes      | Entry cell as `col,row` (0-indexed, top-left)  | `ENTRY=0,0`    |
-| `EXIT`        | Yes      | Exit cell as `col,row`                         | `EXIT=19,14`   |
+| Key           | Required | Description                                    | Example                |
+|---------------|----------|------------------------------------------------|------------------------|
+| `WIDTH`       | Yes      | Number of columns (≥ 2)                        | `WIDTH=20`             |
+| `HEIGHT`      | Yes      | Number of rows (≥ 2)                           | `HEIGHT=15`            |
+| `ENTRY`       | Yes      | Entry cell as `col,row` (0-indexed, top-left)  | `ENTRY=0,0`            |
+| `EXIT`        | Yes      | Exit cell as `col,row`                         | `EXIT=19,14`           |
 | `OUTPUT_FILE` | Yes      | Path for the hex output file                   | `OUTPUT_FILE=maze.txt` |
-| `PERFECT`     | Yes      | `True` = single path, `False` = multiple paths | `PERFECT=True` |
-| `SEED`        | No       | Integer seed for reproducible generation       | `SEED=42`      |
+| `PERFECT`     | Yes      | `True` = single path, `False` = multiple paths | `PERFECT=True`         |
+| `SEED`        | No       | Integer seed for reproducible generation       | `SEED=42`              |
 
 ### Output file format
 
@@ -83,7 +83,7 @@ Wall encoding per cell (4-bit, one hex digit):
 | 2   | South     | 4     |
 | 3   | West      | 8     |
 
-`1` = wall closed, `0` = wall open.  `f` = all walls closed (reserved cell).
+`1` = wall closed, `0` = wall open. `f` = all walls closed (reserved cell).
 
 ## Maze generation algorithm
 
@@ -111,8 +111,7 @@ The algorithm works as follows:
   maze on every run.
 
 For `PERFECT=False`, after the DFS each internal wall has a small
-probability (12 %) of being opened, provided it would not create a 3×3+
-fully-open region.
+probability (12%) of being opened, creating cycles and multiple paths.
 
 The "42" pattern is formed by marking cells as *reserved* before the DFS
 starts: those cells keep all four walls closed (`0xF`) and are skipped
@@ -137,10 +136,10 @@ from mazegen import MazeGenerator
 gen = MazeGenerator(
     width=20,
     height=15,
-    seed=42,        # optional: makes generation reproducible
-    perfect=True,   # optional: single-path maze
-    entry=(0, 0),   # optional: defaults to top-left
-    exit_pos=(19, 14),  # optional: defaults to bottom-right
+    seed=42,             # optional: makes generation reproducible
+    perfect=True,        # optional: single-path maze
+    entry=(0, 0),        # optional: defaults to top-left
+    exit_pos=(19, 14),   # optional: defaults to bottom-right
 )
 gen.generate()
 
@@ -191,17 +190,24 @@ architecture were decided before prompting the AI.
 
 ## Team management
 
-**Team:** solo project (Itakaah).
+**Team:** ausmanov and aousmano.
+
+**Roles:**
+- ausmanov: maze generation algorithm (DFS), config parser, output writer.
+- aousmano: BFS solver, ASCII renderer, interactive menu, reusable module packaging.
 
 **Planning:** The build order followed the dependency chain —
-data model → config → generation → solver → output → renderer → menu.
+data model → config → generation → solver → output → renderer → menu → packaging.
 Each module was linted immediately after writing, before moving on.
+The initial estimate was one week; integration and packaging took longer than expected.
 
-**What worked well:** Writing tests alongside each module caught issues
-early (e.g. wall coherence after DFS, reserved-cell isolation).
+**What worked well:** Splitting responsibilities by module kept merge conflicts
+minimal. Writing tests alongside each module caught issues early
+(e.g. wall coherence after DFS, reserved-cell isolation).
 
 **What to improve:** The renderer output could benefit from a curses-based
-display to avoid screen flicker on each redraw.
+display to avoid screen flicker on each redraw. Better upfront agreement
+on data structures would have reduced integration time.
 
 **Specific tools used:** Python 3.14, flake8 (linting), mypy (static type
 checking), pytest (unit testing), Claude (Anthropic) for AI assistance,
