@@ -29,6 +29,7 @@ CHAR_CORNER: str = "+"
 CHAR_H_WALL: str = "-"
 CHAR_V_WALL: str = "|"
 CHAR_OPEN: str = " "
+CELL_INNER: int = 3  # chars per cell interior / horizontal wall segment
 CHAR_ENTRY: str = "E"
 CHAR_EXIT: str = "X"
 CHAR_PATH: str = "."
@@ -59,7 +60,7 @@ def _render_top_border_line(grid: MazeGrid, wall_color: str) -> str:
         A single rendered line string.
     """
     corner = _colored(CHAR_CORNER, wall_color)
-    h_wall = _colored(CHAR_H_WALL, wall_color)
+    h_wall = _colored(CHAR_H_WALL * CELL_INNER, wall_color)
     parts: list[str] = [corner]
     for _ in range(grid.width):
         parts.append(h_wall)
@@ -88,9 +89,9 @@ def _render_horizontal_border_line(
     for col in range(grid.width):
         cell = grid.get_cell(col, row)
         if cell.reserved or cell.has_wall(WALL_NORTH):
-            parts.append(_colored(CHAR_H_WALL, wall_color))
+            parts.append(_colored(CHAR_H_WALL * CELL_INNER, wall_color))
         else:
-            parts.append(CHAR_OPEN)
+            parts.append(CHAR_OPEN * CELL_INNER)
         parts.append(corner)
     return "".join(parts)
 
@@ -154,9 +155,8 @@ def _render_cell_row_line(
             parts.append(_colored(CHAR_V_WALL, wall_color))
         else:
             parts.append(CHAR_OPEN)
-        parts.append(
-            _cell_body_char(col, row, grid, path_cells, show_path)
-        )
+        body = _cell_body_char(col, row, grid, path_cells, show_path)
+        parts.append(CHAR_OPEN + body + CHAR_OPEN)
     parts.append(_colored(CHAR_V_WALL, wall_color))
     return "".join(parts)
 
@@ -177,9 +177,9 @@ def _render_bottom_border_line(grid: MazeGrid, wall_color: str) -> str:
     for col in range(grid.width):
         cell = grid.get_cell(col, last_row)
         if cell.reserved or cell.has_wall(WALL_SOUTH):
-            parts.append(_colored(CHAR_H_WALL, wall_color))
+            parts.append(_colored(CHAR_H_WALL * CELL_INNER, wall_color))
         else:
-            parts.append(CHAR_OPEN)
+            parts.append(CHAR_OPEN * CELL_INNER)
         parts.append(corner)
     return "".join(parts)
 

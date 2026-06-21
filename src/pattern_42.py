@@ -51,7 +51,7 @@ def get_pattern_cells(
     if width < MIN_MAZE_WIDTH or height < MIN_MAZE_HEIGHT:
         return None
     start_col = (width - PATTERN_TOTAL_WIDTH) // 2
-    start_row = height // 4
+    start_row = (height - PATTERN_HEIGHT) // 2
     gap_start = start_col + PATTERN_DIGIT_WIDTH + PATTERN_GAP
     cells: list[tuple[int, int]] = []
     for digit_row in range(PATTERN_HEIGHT):
